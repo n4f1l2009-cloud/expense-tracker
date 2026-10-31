@@ -2,7 +2,7 @@
 
 Aplikasi web untuk mencatat uang masuk dan uang keluar, memantau saldo, dan mencari riwayat transaksi. Dibuat dengan HTML, CSS, dan JavaScript murni tanpa library eksternal, sebagai proyek akhir kelas **Front-End Web Pemula** di Dicoding.
 
-**Coba langsung:** https://fil.github.io/expense-tracker/
+**Coba langsung:** https://n4f1l2009-cloud.github.io/expense-tracker/
 
 ## Fitur
 
