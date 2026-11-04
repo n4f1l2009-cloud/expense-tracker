@@ -1,598 +1,504 @@
 /* =========================================================
    Expense Tracker App — style.css
-   Konsep: "Nota warung". Setiap daftar transaksi tampil seperti
-   gulungan struk kasir (tepi bergerigi, garis putus-putus, cap
-   tipe transaksi). Bagian lain sengaja dibuat tenang.
-   Penamaan class menggunakan konvensi BEM dengan namespace "tracker"
+   Konsep: tenang dan mudah dipindai. Satu elemen menonjol
+   (kartu saldo gelap), sisanya putih bersih. Mobile-first.
+   Penamaan class: BEM dengan namespace "tracker"
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap');
 
 :root {
-  --bg-page: #E4EAEE;      /* meja: abu kebiruan */
-  --bg-card: #FFFFFF;      /* kertas struk */
-  --paper-edge: #F3F6F8;
+  --bg-page: #F3F5F7;
+  --bg-card: #FFFFFF;
+  --bg-field: #F3F5F7;
 
-  --text-dark: #17212B;    /* tinta */
-  --text-muted: #5C6B78;
+  --text-dark: #141A22;
+  --text-muted: #647080;
 
-  --accent-blue: #2447D6;  /* kobalt, dipakai juga oleh logo di HTML */
-  --accent-light: #EEF2FF;
-  --accent-marker: #F4B63F; /* stabilo kuning */
+  --accent: #2F4BDB;
+  --accent-soft: #E9EDFE;
 
-  --color-income: #0B7A55;
-  --bg-income: #E3F5EC;
-  --color-expense: #C42B55;
-  --bg-expense: #FBE6EC;
+  --color-income: #0E8A5F;
+  --bg-income: #E2F5EC;
+  --color-expense: #D13A5E;
+  --bg-expense: #FCE8ED;
 
-  --border-light: #CBD5DD;
-  --rule: #B4C0CA;
+  --border: #E1E6EB;
+  --ink-card: #141A22;
 
-  --font-family: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
-
-  --radius-card: 10px;
-  --radius-field: 8px;
-  --card-padding: 24px;
+  --font: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 16px;
+  --radius-field: 12px;
+  --gap: 1rem;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
+
 body {
-  background-color: var(--bg-page);
+  background: var(--bg-page);
   color: var(--text-dark);
-  font-family: var(--font-family);
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
-  padding: 1.5rem;
+  line-height: 1.45;
+  padding: 1rem;
   display: flex;
   justify-content: center;
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent-blue);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* =========================================================
-   UTILITAS AKSESIBILITAS (SCREEN READER ONLY)
-   ========================================================= */
 .visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
   margin: -1px;
+  padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
 }
 
-/* =========================================================
-   TRACKER APP — WRAPPER UTAMA
-   ========================================================= */
+[hidden] { display: none !important; }
+
+/* ---------- Wrapper ---------- */
 .tracker-app {
-  max-width: 1200px;
   width: 100%;
+  max-width: 1040px;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.25rem;
 }
 
 .tracker-app main {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.25rem;
 }
 
-/* Kartu dasar (ringkasan, form, pencarian) */
-.tracker-summary__balance,
-.tracker-summary__stat,
-.tracker-form-section__card,
-.tracker-search {
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-light);
-  padding: var(--card-padding);
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* =========================================================
-   TRACKER HEADER
-   ========================================================= */
+/* ---------- Header ---------- */
 .tracker-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  gap: 1rem;
+  padding: 0.25rem 0;
 }
 
 .tracker-header__title {
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 
-.tracker-header__user {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.tracker-header__user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+.tracker-header__dot { color: var(--accent); }
 
 .tracker-header__greeting {
-  font-size: 0.95rem;
-  color: var(--text-dark);
-}
-
-.tracker-header__date {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  font-weight: 400;
+  text-align: right;
 }
 
-.tracker-header__avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: var(--bg-card);
-  border: 2px solid var(--text-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
+.tracker-header__greeting strong { color: var(--text-dark); font-weight: 600; }
 
-/* =========================================================
-   TRACKER SUMMARY — RINGKASAN SALDO
-   ========================================================= */
+/* ---------- Ringkasan ---------- */
 .tracker-summary {
   display: grid;
-  grid-template-columns: 2fr 1.25fr 1.25fr;
-  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
+.tracker-summary__balance,
+.tracker-summary__stat {
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  min-width: 0;
 }
 
 .tracker-summary__label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
+/* Satu-satunya elemen yang menonjol */
 .tracker-summary__balance {
-  border-left: 6px solid var(--text-dark);
+  grid-column: span 2;
+  background: var(--ink-card);
+  color: #fff;
+  padding: 1.5rem 1.5rem 1.6rem;
 }
+
+.tracker-summary__balance .tracker-summary__label { color: #A9B3C0; }
 
 .tracker-summary__balance-amount {
-  font-family: var(--font-mono);
-  font-size: 3rem;
-  font-weight: 600;
+  margin-top: 0.35rem;
+  font-size: clamp(2rem, 9vw, 2.9rem);
+  font-weight: 800;
   letter-spacing: -0.04em;
-  margin-top: auto;
-  width: fit-content;
-  max-width: 100%;
-  /* satu-satunya "stabilo" di halaman: menandai saldo */
-  background: linear-gradient(transparent 62%, var(--accent-marker) 62% 92%, transparent 92%);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
 }
+
+.tracker-summary__stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.tracker-summary__stat .tracker-summary__label {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tracker-summary__stat .tracker-summary__label::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tracker-summary__stat--income .tracker-summary__label { color: var(--color-income); }
+.tracker-summary__stat--expense .tracker-summary__label { color: var(--color-expense); }
 
 .tracker-summary__stat-amount {
-  font-family: var(--font-mono);
-  font-size: 1.9rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  margin-top: auto;
-}
-
-.tracker-summary__stat-amount--income { color: var(--color-income); }
-.tracker-summary__stat-amount--expense { color: var(--color-expense); }
-
-/* =========================================================
-   TRACKER FORM — INPUT TRANSAKSI BARU
-   ========================================================= */
-.tracker-form-section__heading {
-  font-size: 1.1rem;
+  margin-top: 0.3rem;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Form ---------- */
+.tracker-form-section__card,
+.tracker-search {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Mode edit: kartu form diberi penanda biru */
+.tracker-form-section__card.is-editing {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.tracker-form-section__heading {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   margin-bottom: 1rem;
 }
 
 .tracker-form {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 1rem;
-  align-items: end;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
 }
 
 .tracker-form__field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
+.tracker-form__field--title { grid-column: span 2; }
+
 .tracker-form__label {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--text-muted);
 }
 
 .tracker-form__input {
   width: 100%;
-  padding: 0.8rem 1rem;
+  min-height: 48px;
+  padding: 0.7rem 0.9rem;
   border-radius: var(--radius-field);
-  border: 1.5px solid var(--border-light);
-  background: var(--paper-edge);
+  border: 1.5px solid transparent;
+  background: var(--bg-field);
   color: var(--text-dark);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem; /* 16px: mencegah zoom otomatis di iOS */
   outline: none;
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
+.tracker-form__input::placeholder { color: #98A2AF; }
+
 .tracker-form__input:focus {
-  border-color: var(--text-dark);
+  border-color: var(--accent);
   background: var(--bg-card);
-  box-shadow: 0 0 0 3px rgba(36, 71, 214, 0.25);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.tracker-form__input.is-invalid {
+  border-color: var(--color-expense);
+  background: var(--bg-expense);
+}
+
+.tracker-form__actions {
+  grid-column: span 2;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tracker-form__submit,
+.tracker-form__cancel,
+.tracker-search__submit {
+  min-height: 48px;
+  padding: 0 1.4rem;
+  border-radius: var(--radius-field);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, transform 0.1s;
 }
 
 .tracker-form__submit {
-  background: var(--text-dark);
-  color: var(--accent-marker);
-  border: none;
-  padding: 0.85rem 1.5rem;
-  height: 46px;
-  border-radius: var(--radius-field);
-  font-family: inherit;
-  font-weight: 800;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: transform 0.1s, background-color 0.2s;
-}
-
-.tracker-form__submit:hover { background: #000; }
-.tracker-form__submit:active { transform: translateY(1px); }
-
-/* =========================================================
-   TRACKER SEARCH — FORM PENCARIAN
-   ========================================================= */
-.tracker-history {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.tracker-search {
-  padding: 1.1rem 1.5rem;
-}
-
-.tracker-search__form {
-  display: flex;
-  gap: 1rem;
-}
-
-.tracker-search__form .tracker-form__input {
   flex: 1;
-}
-
-.tracker-search__submit {
-  background: var(--bg-card);
-  color: var(--text-dark);
-  border: 1.5px solid var(--text-dark);
-  padding: 0 1.5rem;
-  border-radius: var(--radius-field);
-  font-family: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.tracker-search__submit:hover {
-  background: var(--text-dark);
+  border: none;
+  background: var(--accent);
   color: #fff;
 }
 
-/* =========================================================
-   TRACKER HISTORY — GULUNGAN STRUK
-   ========================================================= */
+.tracker-form__submit:hover { background: #2239B8; }
+.tracker-form__submit:active { transform: scale(0.98); }
+
+.tracker-form__cancel,
+.tracker-search__submit {
+  background: transparent;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border);
+}
+
+.tracker-form__cancel:hover,
+.tracker-search__submit:hover { background: var(--bg-field); }
+
+.tracker-form__error {
+  grid-column: span 2;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-expense);
+  background: var(--bg-expense);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-field);
+}
+
+/* ---------- Pencarian ---------- */
+.tracker-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tracker-search { padding: 0.75rem; }
+
+.tracker-search__form {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.tracker-search__form .tracker-form__input { flex: 1; }
+
+/* ---------- Daftar transaksi ---------- */
 .tracker-history__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.75rem;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
   align-items: start;
 }
 
 .tracker-transaction-list {
-  position: relative;
   background: var(--bg-card);
-  border-radius: 3px 3px 0 0;
-  padding: var(--card-padding);
-  padding-bottom: 1.25rem;
-  display: flex;
-  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.25rem 0.5rem;
   min-width: 0;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 2px 1px rgba(23, 33, 43, 0.12));
-}
-
-/* Tepi bawah bergerigi seperti sobekan struk */
-.tracker-transaction-list::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 10px;
-  background: conic-gradient(from -45deg at bottom, #0000, var(--bg-card) 1deg 89deg, #0000 90deg) 50% / 20px 100%;
 }
 
 .tracker-transaction-list__header {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 2px dashed var(--rule);
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .tracker-transaction-list__title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  padding-left: 0.65rem;
-  border-left: 4px solid var(--text-dark);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
-.tracker-history__grid > .tracker-transaction-list:first-child .tracker-transaction-list__title {
-  border-left-color: var(--color-income);
+.tracker-transaction-list__title::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
 }
 
-.tracker-history__grid > .tracker-transaction-list:last-child .tracker-transaction-list__title {
-  border-left-color: var(--color-expense);
-}
+.tracker-transaction-list--income .tracker-transaction-list__title::before { background: var(--color-income); }
+.tracker-transaction-list--expense .tracker-transaction-list__title::before { background: var(--color-expense); }
 
 .tracker-transaction-list__container {
   display: flex;
   flex-direction: column;
 }
 
-/* =========================================================
-   TRACKER TRANSACTION ITEM — BARIS NOTA
-   ========================================================= */
+/* ---------- Item transaksi ---------- */
 .tracker-transaction-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  grid-template-areas:
+    "icon detail amount"
+    ".    actions actions";
+  column-gap: 0.85rem;
+  row-gap: 0.6rem;
   align-items: center;
-  gap: 1rem;
-  padding: 0.9rem 0;
-  border-bottom: 1.5px dashed var(--border-light);
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .tracker-transaction-item:last-child { border-bottom: none; }
 
-/* Ikon dibuat seperti cap stempel */
 .tracker-transaction-item__icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
+  grid-area: icon;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 1.35rem;
-  font-weight: 600;
-  flex-shrink: 0;
-  transform: rotate(-8deg);
-  border: 2px dashed currentColor;
+  font-size: 1.15rem;
+  font-weight: 800;
 }
 
-.tracker-transaction-item__icon--income {
-  background: var(--bg-income);
-  color: var(--color-income);
-}
-
-.tracker-transaction-item__icon--expense {
-  background: var(--bg-expense);
-  color: var(--color-expense);
-}
+.tracker-transaction-item__icon--income { background: var(--bg-income); color: var(--color-income); }
+.tracker-transaction-item__icon--expense { background: var(--bg-expense); color: var(--color-expense); }
 
 .tracker-transaction-item__detail {
-  flex: 1;
+  grid-area: detail;
   min-width: 0;
 }
 
 .tracker-transaction-item__title {
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
+  font-size: 0.98rem;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .tracker-transaction-item__date {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.tracker-transaction-item__right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.4rem;
-  flex-shrink: 0;
+  line-height: 1.4;
 }
 
 .tracker-transaction-item__amount {
-  font-family: var(--font-mono);
-  font-weight: 600;
+  grid-area: amount;
   font-size: 0.95rem;
+  font-weight: 800;
+  text-align: right;
 }
 
 .tracker-transaction-item__amount--income { color: var(--color-income); }
 .tracker-transaction-item__amount--expense { color: var(--color-expense); }
 
 .tracker-transaction-item__actions {
+  grid-area: actions;
   display: flex;
-  gap: 0.3rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .tracker-transaction-item__btn {
-  background: var(--bg-card);
+  flex: 1;
+  min-height: 40px;
+  background: var(--bg-field);
   color: var(--text-dark);
-  border: 1.5px solid var(--border-light);
-  padding: 0.2rem 0.5rem;
-  font-size: 0.75rem;
+  border: none;
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.tracker-transaction-item__btn:hover {
-  background: var(--text-dark);
-  border-color: var(--text-dark);
-  color: #fff;
-}
-
-.tracker-transaction-item__btn[data-testid="transactionItemDeleteButton"]:hover {
-  background: var(--color-expense);
-  border-color: var(--color-expense);
-}
+.tracker-transaction-item__btn:hover { background: var(--border); }
 
 .tracker-transaction-item__btn[data-testid="transactionItemEditButton"]:hover {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
-/* =========================================================
-   TRACKER FOOTER
-   ========================================================= */
+.tracker-transaction-item__btn[data-testid="transactionItemDeleteButton"] { color: var(--color-expense); }
+
+.tracker-transaction-item__btn[data-testid="transactionItemDeleteButton"]:hover {
+  background: var(--bg-expense);
+}
+
+.tracker-empty {
+  padding: 1.75rem 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Footer ---------- */
 .tracker-footer {
   text-align: center;
-  padding: 1.5rem 0 0.5rem 0;
+  padding: 0.75rem 0 0.5rem;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: 1rem;
+  font-size: 0.8rem;
 }
 
-/* =========================================================
-   RESPONSIVE — TABLET (≤ 1024px)
-   ========================================================= */
-@media (max-width: 1024px) {
-  .tracker-summary {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .tracker-summary__balance {
-    grid-column: span 2;
-  }
-
-  .tracker-form {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .tracker-form__field:nth-child(1) {
-    grid-column: span 2;
-  }
-
-  .tracker-form__submit {
-    grid-column: span 2;
-  }
-
-  .tracker-history__grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE — MOBILE (≤ 768px)
-   ========================================================= */
-@media (max-width: 768px) {
-  body { padding: 0.75rem; }
+/* ---------- Tablet & desktop ---------- */
+@media (min-width: 720px) {
+  body { padding: 2rem; }
 
   .tracker-app,
-  .tracker-app main { gap: 1rem; }
+  .tracker-app main { gap: 1.5rem; }
 
-  .tracker-summary {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+  .tracker-header__title { font-size: 1.6rem; }
 
-  .tracker-summary__balance,
-  .tracker-summary__stat {
-    grid-column: span 1;
-    padding: 1.25rem;
-  }
-
-  .tracker-summary__balance-amount {
-    font-size: 2rem;
-    word-break: break-all;
-  }
-
+  .tracker-summary { grid-template-columns: 1.6fr 1fr 1fr; }
+  .tracker-summary__balance { grid-column: auto; }
+  .tracker-summary__stat { display: flex; flex-direction: column; justify-content: flex-end; }
   .tracker-summary__stat-amount { font-size: 1.5rem; }
 
-  .tracker-form-section__card { padding: 1.25rem; }
+  .tracker-form-section__card { padding: 1.5rem; }
 
   .tracker-form {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.25rem;
+    grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr;
+    align-items: end;
   }
 
-  .tracker-form__submit { width: 100%; margin-top: 0.5rem; }
+  .tracker-form__field--title { grid-column: auto; }
+  .tracker-form__actions { grid-column: 1 / -1; justify-content: flex-end; }
+  .tracker-form__submit { flex: 0 0 auto; min-width: 180px; }
+  .tracker-form__error { grid-column: 1 / -1; }
 
-  .tracker-history__grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .tracker-transaction-list { padding: 1.25rem; padding-bottom: 1rem; }
+  .tracker-history__grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .tracker-transaction-list { padding: 1.5rem 1.5rem 0.75rem; }
 }
 
-/* =========================================================
-   RESPONSIVE — MOBILE KECIL (≤ 640px)
-   ========================================================= */
-@media (max-width: 640px) {
-  .tracker-search__form { flex-direction: column; }
-  .tracker-search__submit { width: 100%; padding: 0.85rem; }
-
-  .tracker-transaction-item {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
-  .tracker-transaction-item__right {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    margin-top: 0.5rem;
-    gap: 0.75rem;
-  }
-
-  .tracker-transaction-item__amount {
-    padding-left: 4rem;
-  }
-
-  .tracker-transaction-item__actions { width: 100%; }
-
-  .tracker-transaction-item__btn {
-    flex: 1;
-    padding: 0.7rem 0;
-    font-size: 0.85rem;
-  }
-}
-
-/* Hormati pengguna yang mematikan animasi */
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+  * { transition: none !important; scroll-behavior: auto !important; }
 }

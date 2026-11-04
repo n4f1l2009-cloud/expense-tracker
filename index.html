@@ -11,16 +11,8 @@
   <div class="tracker-app">
 
     <header class="tracker-header">
-      <h1 class="tracker-header__title">Tracker<span style="color:var(--accent-blue)">.io</span></h1>
-      <div class="tracker-header__user">
-        <div class="tracker-header__user-info">
-          <!-- TODO: Ganti "Siswa Front-End" dengan Nama Lengkap dan Username Dicoding kamu.
-               Contoh: Halo, <strong>Budi (bdi002)</strong> -->
-          <span class="tracker-header__greeting">Halo, <strong>Muhammad Nafil Zamri(nafill)</strong></span>
-          <span class="tracker-header__date">Bulan Ini</span>
-        </div>
-        <div class="tracker-header__avatar" role="img" aria-label="Avatar Pengguna" aria-hidden="true">👤</div>
-      </div>
+      <h1 class="tracker-header__title">Tracker<span class="tracker-header__dot">.io</span></h1>
+      <p class="tracker-header__greeting">Halo, <strong>Muhammad Nafil Zamri(nafill)</strong></p>
     </header>
 
     <main>
@@ -32,42 +24,46 @@
           <p class="tracker-summary__balance-amount">Rp 0</p>
         </div>
 
-        <div class="tracker-summary__stat">
+        <div class="tracker-summary__stat tracker-summary__stat--income">
           <h3 class="tracker-summary__label">Pemasukan</h3>
           <p class="tracker-summary__stat-amount tracker-summary__stat-amount--income">Rp 0</p>
         </div>
 
-        <div class="tracker-summary__stat">
+        <div class="tracker-summary__stat tracker-summary__stat--expense">
           <h3 class="tracker-summary__label">Pengeluaran</h3>
           <p class="tracker-summary__stat-amount tracker-summary__stat-amount--expense">Rp 0</p>
         </div>
       </section>
 
       <section class="tracker-form-section" aria-labelledby="form-heading">
-        <div class="tracker-form-section__card">
-          <h2 id="form-heading" class="tracker-form-section__heading">Tambah Pencatatan Baru</h2>
+        <div class="tracker-form-section__card" id="formCard">
+          <h2 id="form-heading" class="tracker-form-section__heading">Catat transaksi</h2>
 
-          <form id="transactionForm" data-testid="transactionForm" class="tracker-form">
-            <div class="tracker-form__field">
+          <form id="transactionForm" data-testid="transactionForm" class="tracker-form" novalidate>
+            <div class="tracker-form__field tracker-form__field--title">
               <label class="tracker-form__label" for="transactionFormTitleInput">Keterangan</label>
-              <input type="text" id="transactionFormTitleInput" data-testid="transactionFormTitleInput" class="tracker-form__input" placeholder="Misal: Makan siang...">
+              <input type="text" id="transactionFormTitleInput" data-testid="transactionFormTitleInput" class="tracker-form__input" placeholder="Misal: Makan siang" autocomplete="off">
             </div>
             <div class="tracker-form__field">
               <label class="tracker-form__label" for="transactionFormAmountInput">Nominal (Rp)</label>
-              <input type="number" id="transactionFormAmountInput" data-testid="transactionFormAmountInput" class="tracker-form__input" placeholder="50000">
+              <input type="number" id="transactionFormAmountInput" data-testid="transactionFormAmountInput" class="tracker-form__input" placeholder="50000" inputmode="numeric" min="1">
             </div>
             <div class="tracker-form__field">
               <label class="tracker-form__label" for="transactionFormDateInput">Tanggal</label>
               <input type="date" id="transactionFormDateInput" data-testid="transactionFormDateInput" class="tracker-form__input">
             </div>
             <div class="tracker-form__field">
-              <label class="tracker-form__label" for="transactionFormTypeSelect">Klasifikasi</label>
+              <label class="tracker-form__label" for="transactionFormTypeSelect">Jenis</label>
               <select id="transactionFormTypeSelect" data-testid="transactionFormTypeSelect" class="tracker-form__input">
                 <option value="income">Uang Masuk (+)</option>
                 <option value="expense">Uang Keluar (-)</option>
               </select>
             </div>
-            <button type="submit" data-testid="transactionFormSubmitButton" class="tracker-form__submit">Simpan</button>
+            <div class="tracker-form__actions">
+              <button type="submit" data-testid="transactionFormSubmitButton" class="tracker-form__submit">Simpan</button>
+              <button type="button" id="cancelEditButton" class="tracker-form__cancel" hidden>Batal</button>
+            </div>
+            <p id="formError" class="tracker-form__error" role="alert" hidden></p>
           </form>
         </div>
       </section>
@@ -77,34 +73,29 @@
 
         <div class="tracker-search">
           <form id="searchTransactionForm" data-testid="searchTransactionForm" class="tracker-search__form" role="search">
-            <input type="search" id="searchTransactionFormTitleInput" data-testid="searchTransactionFormTitleInput" class="tracker-form__input" placeholder="Cari transaksi berdasarkan judul..." aria-label="Kata kunci pencarian transaksi">
+            <input type="search" id="searchTransactionFormTitleInput" data-testid="searchTransactionFormTitleInput" class="tracker-form__input" placeholder="Cari transaksi..." aria-label="Kata kunci pencarian transaksi">
             <button type="submit" data-testid="searchTransactionFormSubmitButton" class="tracker-search__submit" aria-label="Mulai Pencarian">Cari</button>
           </form>
         </div>
 
         <div class="tracker-history__grid">
-          <div class="tracker-transaction-list">
+          <div class="tracker-transaction-list tracker-transaction-list--income">
             <div class="tracker-transaction-list__header">
               <h3 class="tracker-transaction-list__title">Arus Pemasukan</h3>
             </div>
             <!-- Jangan ubah atau hapus atribut data-testid pada elemen berikut -->
-            <div id="incomeList" data-testid="incomeList" class="tracker-transaction-list__container">
-              <!-- Kartu transaksi pemasukan akan disisipkan di sini oleh JavaScript -->
-            </div>
+            <div id="incomeList" data-testid="incomeList" class="tracker-transaction-list__container"></div>
           </div>
 
-          <div class="tracker-transaction-list">
+          <div class="tracker-transaction-list tracker-transaction-list--expense">
             <div class="tracker-transaction-list__header">
               <h3 class="tracker-transaction-list__title">Arus Pengeluaran</h3>
             </div>
             <!-- Jangan ubah atau hapus atribut data-testid pada elemen berikut -->
-            <div id="expenseList" data-testid="expenseList" class="tracker-transaction-list__container">
-              <!-- Kartu transaksi pengeluaran akan disisipkan di sini oleh JavaScript -->
-            </div>
+            <div id="expenseList" data-testid="expenseList" class="tracker-transaction-list__container"></div>
           </div>
         </div>
       </section>
-
     </main>
 
     <footer class="tracker-footer">

@@ -6,16 +6,18 @@
 
 const STORAGE_KEY = 'expense-tracker:transactions';
 
-// Array utama penyimpan semua transaksi
 let transactions = [];
-// Kata kunci pencarian aktif (kosong = tampilkan semua)
 let searchKeyword = '';
-// ID transaksi yang sedang diedit (null = mode Tambah)
 let editingId = null;
 
-// Fungsi ID unik
 function generateId() {
   return +new Date();
+}
+
+function todayString() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  return new Date(now - offset).toISOString().slice(0, 10);
 }
 
 /**
@@ -27,6 +29,10 @@ const incomeList = document.getElementById('incomeList');
 const expenseList = document.getElementById('expenseList');
 
 const transactionForm = document.getElementById('transactionForm');
+const formCard = document.getElementById('formCard');
+const formHeading = document.getElementById('form-heading');
+const formError = document.getElementById('formError');
+const cancelButton = document.getElementById('cancelEditButton');
 const titleInput = document.getElementById('transactionFormTitleInput');
 const amountInput = document.getElementById('transactionFormAmountInput');
 const dateInput = document.getElementById('transactionFormDateInput');
@@ -42,9 +48,12 @@ const expenseEl = document.querySelector('.tracker-summary__stat-amount--expense
 
 const SUBMIT_LABEL_ADD = submitButton.textContent;
 const SUBMIT_LABEL_EDIT = 'Simpan Perubahan';
+const HEADING_ADD = formHeading.textContent;
+const HEADING_EDIT = 'Ubah transaksi';
 
 function formatRupiah(number) {
-  return 'Rp ' + number.toLocaleString('id-ID');
+  const sign = number < 0 ? '-' : '';
+  return sign + 'Rp ' + Math.abs(number).toLocaleString('id-ID');
 }
 
 function typeLabel(type) {
@@ -61,7 +70,6 @@ function createButton(testId, text, onClick) {
   return button;
 }
 
-// Membuat satu kartu transaksi dengan document.createElement()
 function createTransactionCard(transaction) {
   const card = document.createElement('div');
   card.setAttribute('data-testid', 'transactionItem');
@@ -79,6 +87,7 @@ function createTransactionCard(transaction) {
   title.setAttribute('data-testid', 'transactionItemTitle');
   title.className = 'tracker-transaction-item__title';
   title.textContent = transaction.title;
+  title.title = transaction.title;
 
   const date = document.createElement('p');
   date.setAttribute('data-testid', 'transactionItemDate');
@@ -91,9 +100,6 @@ function createTransactionCard(transaction) {
   type.textContent = `Tipe: ${typeLabel(transaction.type)}`;
 
   detail.append(title, date, type);
-
-  const right = document.createElement('div');
-  right.className = 'tracker-transaction-item__right';
 
   const amount = document.createElement('p');
   amount.setAttribute('data-testid', 'transactionItemAmount');
@@ -108,19 +114,17 @@ function createTransactionCard(transaction) {
     createButton('transactionItemDeleteButton', 'Hapus', () => deleteTransaction(transaction.id))
   );
 
-  right.append(amount, actions);
-  card.append(icon, detail, right);
+  card.append(icon, detail, amount, actions);
   return card;
 }
 
 function createEmptyState(text) {
   const p = document.createElement('p');
-  p.className = 'tracker-transaction-item__date';
+  p.className = 'tracker-empty';
   p.textContent = text;
   return p;
 }
 
-// Render semua transaksi (sesuai filter pencarian) ke layar
 function renderTransactions() {
   incomeList.innerHTML = '';
   expenseList.innerHTML = '';
@@ -130,22 +134,19 @@ function renderTransactions() {
 
   for (const transaction of visible) {
     const card = createTransactionCard(transaction);
-    if (transaction.type === 'income') {
-      incomeList.appendChild(card);
-    } else {
-      expenseList.appendChild(card);
-    }
+    (transaction.type === 'income' ? incomeList : expenseList).appendChild(card);
   }
 
+  const searching = keyword !== '';
   if (!incomeList.children.length) {
-    incomeList.appendChild(createEmptyState('Belum ada pemasukan.'));
+    incomeList.appendChild(createEmptyState(searching ? 'Tidak ada pemasukan yang cocok.' : 'Belum ada pemasukan. Catat yang pertama di atas.'));
   }
   if (!expenseList.children.length) {
-    expenseList.appendChild(createEmptyState('Belum ada pengeluaran.'));
+    expenseList.appendChild(createEmptyState(searching ? 'Tidak ada pengeluaran yang cocok.' : 'Belum ada pengeluaran. Catat yang pertama di atas.'));
   }
 }
 
-// Panel Dasbor: selalu dihitung dari seluruh transaksi (bukan hasil filter)
+// Dasbor selalu dihitung dari seluruh transaksi (bukan hasil filter)
 function updateDashboard() {
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
@@ -177,7 +178,6 @@ function loadTransactions() {
   }
 }
 
-// Satu-satunya jalur pembaruan tampilan: lewat Custom Event
 const UPDATE_EVENT = 'transaction:updated';
 
 document.addEventListener(UPDATE_EVENT, () => {
@@ -185,17 +185,41 @@ document.addEventListener(UPDATE_EVENT, () => {
   updateDashboard();
 });
 
-// Dipanggil setiap data berubah: simpan lalu kirim sinyal
 function commitChanges() {
   saveTransactions();
   document.dispatchEvent(new Event(UPDATE_EVENT));
 }
 
+/* ---------- Form: error inline & mode edit ---------- */
+function showError(message, field) {
+  formError.textContent = message;
+  formError.hidden = false;
+  field.classList.add('is-invalid');
+  field.focus();
+}
+
+function clearError() {
+  formError.hidden = true;
+  formError.textContent = '';
+  titleInput.classList.remove('is-invalid');
+  amountInput.classList.remove('is-invalid');
+}
+
+titleInput.addEventListener('input', clearError);
+amountInput.addEventListener('input', clearError);
+
 function resetFormMode() {
   editingId = null;
   transactionForm.reset();
+  dateInput.value = todayString();
   submitButton.textContent = SUBMIT_LABEL_ADD;
+  formHeading.textContent = HEADING_ADD;
+  formCard.classList.remove('is-editing');
+  cancelButton.hidden = true;
+  clearError();
 }
+
+cancelButton.addEventListener('click', resetFormMode);
 
 function deleteTransaction(id) {
   transactions = transactions.filter((t) => t.id !== id);
@@ -207,31 +231,35 @@ function startEdit(id) {
   const transaction = transactions.find((t) => t.id === id);
   if (!transaction) return;
 
+  clearError();
   editingId = id;
   titleInput.value = transaction.title;
   amountInput.value = transaction.amount;
   dateInput.value = transaction.date;
   typeSelect.value = transaction.type;
   submitButton.textContent = SUBMIT_LABEL_EDIT;
-  titleInput.focus();
-  transactionForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  formHeading.textContent = HEADING_EDIT;
+  formCard.classList.add('is-editing');
+  cancelButton.hidden = false;
+  formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  titleInput.focus({ preventScroll: true });
 }
 
 transactionForm.addEventListener('submit', (e) => {
   e.preventDefault();
+  clearError();
 
   const title = titleInput.value.trim();
   const amount = Number(amountInput.value);
-  const date = dateInput.value || new Date().toISOString().slice(0, 10);
+  const date = dateInput.value || todayString();
   const type = typeSelect.value;
 
-  // Validasi (Skilled)
   if (title === '') {
-    alert('Keterangan transaksi tidak boleh kosong!');
+    showError('Isi keterangan transaksi dulu.', titleInput);
     return;
   }
   if (!(amount >= 1)) {
-    alert('Nominal transaksi minimal Rp 1!');
+    showError('Nominal minimal Rp 1.', amountInput);
     return;
   }
 
@@ -263,13 +291,11 @@ function toggleType(id) {
   commitChanges();
 }
 
-// Pencarian langsung saat mengetik; kolom kosong otomatis menampilkan semua
 searchInput.addEventListener('input', () => {
   searchKeyword = searchInput.value;
   renderTransactions();
 });
 
-// Tombol "Cari" tetap berfungsi tanpa me-reload halaman
 searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
   searchKeyword = searchInput.value;
@@ -282,4 +308,5 @@ searchForm.addEventListener('submit', (e) => {
  * ========================================================
  */
 loadTransactions();
+dateInput.value = todayString();
 document.dispatchEvent(new Event(UPDATE_EVENT));
